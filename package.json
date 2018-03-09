@@ -1,0 +1,19 @@
+{
+  "name": "express-controller-unit-testing",
+  "main": "server.js",
+  "scripts": {
+    "test": "istanbul cover _mocha app/**/*.spec.js",
+    "start": "node server"
+  },
+  "dependencies": {
+    "express": "~4.16.2",
+    "mongoose": "~5.0.9",
+    "body-parser": "~1.18.2 ",
+    "method-override": "~2.3.10"
+  },
+  "devDependencies": {
+    "chai": "^3.5.0",
+    "sinon": "^1.17.7",
+    "proxyquire": "^1.7.11"
+  }
+}
