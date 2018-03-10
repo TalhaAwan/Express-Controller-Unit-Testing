@@ -175,7 +175,7 @@ describe('Vehicle Controller', function () {
         it('should return 404 with a message for non-existing driver', sinon.test(function () {
             this.stub(Driver, 'findOne').yields(null, null);
             Controller.assignDriver(req, res);
-            sinon.assert.calledWith(Driver.findOne, { _id: req.params.driverId }, { new: true });
+            sinon.assert.calledWith(Driver.findOne, { _id: req.params.driverId });
             sinon.assert.calledWith(res.status, 404);
             sinon.assert.calledWith(res.status(404).json, { message: "driver not found" });
         }));
@@ -183,41 +183,53 @@ describe('Vehicle Controller', function () {
             expectedResult.available = false;
             this.stub(Driver, 'findOne').yields(null, expectedResult);
             Controller.assignDriver(req, res);
-            sinon.assert.calledWith(Driver.findOne, { _id: req.params.driverId }, { new: true });
+            sinon.assert.calledWith(Driver.findOne, { _id: req.params.driverId });
             sinon.assert.calledWith(res.status, 403);
             sinon.assert.calledWith(res.status(403).json, { message: "driver unavailable" });
         }));
-        it('should return status 500 on server error (assigning driver)', sinon.test(function () {
+        it('should return status 500 on server error (finding vehicle)', sinon.test(function () {
             this.stub(Driver, 'findOne').yields(null, expectedDriver);
-            this.stub(Vehicle, 'findByIdAndUpdate').yields(error);
+            this.stub(Vehicle, 'findById').yields(error);
             Controller.assignDriver(req, res);
-            sinon.assert.calledOnce(Vehicle.findByIdAndUpdate);
+            sinon.assert.calledOnce(Vehicle.findById);
             sinon.assert.calledWith(res.status, 500);
             sinon.assert.calledOnce(res.status(500).end);
         }));
         it('should return 404 with a message for non-existing vehicle', sinon.test(function () {
             this.stub(Driver, 'findOne').yields(null, expectedDriver);
-            this.stub(Vehicle, 'findByIdAndUpdate').yields(null, null);
+            this.stub(Vehicle, 'findById').yields(null, null);
             Controller.assignDriver(req, res);
-            sinon.assert.calledWith(Driver.findOne, { _id: req.params.driverId }, { new: true });
-            sinon.assert.calledWith(Vehicle.findByIdAndUpdate, req.params.id, { $addToSet: { drivers: req.params.driverId } }, { new: true });
+            sinon.assert.calledWith(Driver.findOne, { _id: req.params.driverId });
+            sinon.assert.calledWith(Vehicle.findById, req.params.id);
             sinon.assert.calledWith(res.status, 404);
             sinon.assert.calledWith(res.status(404).json, { message: "vehicle not found" });
         })); 
         it('should return 403 with a message if 3 drivers already assigned', sinon.test(function () {
-            expectedResult.drivers = [1, 2, 3, 4]
+            expectedResult.drivers = [1, 2, 3]
             this.stub(Driver, 'findOne').yields(null, expectedDriver);
-            this.stub(Vehicle, 'findByIdAndUpdate').yields(null, expectedResult);
+            this.stub(Vehicle, 'findById').yields(null, expectedResult);
             Controller.assignDriver(req, res);
-            sinon.assert.calledWith(Driver.findOne, { _id: req.params.driverId }, { new: true });
+            sinon.assert.calledWith(Driver.findOne, { _id: req.params.driverId });
+            sinon.assert.calledWith(Vehicle.findById, req.params.id);
             sinon.assert.calledWith(res.status, 403);
             sinon.assert.calledWith(res.status(403).json, { message: "maximum drivers assigned, can't assign new" });
         }));
+        it('should return status 500 on server error (assigning driver)', sinon.test(function () {
+            this.stub(Driver, 'findOne').yields(null, expectedDriver);
+            this.stub(Vehicle, 'findById').yields(null, expectedResult);
+            this.stub(Vehicle, 'findByIdAndUpdate').yields(error);
+            Controller.assignDriver(req, res);
+            sinon.assert.calledWith(Vehicle.findById, req.params.id);
+            sinon.assert.calledWith(res.status, 500);
+            sinon.assert.calledOnce(res.status(500).end);
+        }));
         it('should return updated vehicle obj with drivers array', sinon.test(function () {
             this.stub(Driver, 'findOne').yields(null, expectedDriver);
+            this.stub(Vehicle, 'findById').yields(null, expectedResult);
             this.stub(Vehicle, 'findByIdAndUpdate').yields(null, expectedResult);
             Controller.assignDriver(req, res);
-            sinon.assert.calledWith(Driver.findOne, { _id: req.params.driverId }, { new: true });
+            sinon.assert.calledWith(Driver.findOne, { _id: req.params.driverId });
+            sinon.assert.calledWith(Vehicle.findById, req.params.id);
             sinon.assert.calledWith(Vehicle.findByIdAndUpdate, req.params.id, { $addToSet: { drivers: req.params.driverId } }, { new: true });
             sinon.assert.calledWith(res.json, sinon.match({ drivers: expectedResult.drivers }));
         }));      

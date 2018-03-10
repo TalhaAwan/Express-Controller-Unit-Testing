@@ -72,29 +72,36 @@ Controller.update = function (req, res) {
 
 
 Controller.assignDriver = function (req, res) {
-    return Driver.findOne({ _id: req.params.driverId }, { new: true }, function (err, driver) {
+    return Driver.findOne({ _id: req.params.driverId }, function (err, driver) {
         if (err) {
             return res.status(500).end();
         }
         else if (!driver) {
-            return res.status(404).json({message: "driver not found"});
+            return res.status(404).json({ message: "driver not found" });
         }
-        else if (!driver.available){
-            return res.status(403).json({message: "driver unavailable"});
+        else if (!driver.available) {
+            return res.status(403).json({ message: "driver unavailable" });
         }
         else {
-            return Vehicle.findByIdAndUpdate(req.params.id, { $addToSet: { drivers: req.params.driverId } }, { new: true }, function (err, vehicle) {
+            return Vehicle.findById(req.params.id, function (err, vehicle) {
                 if (err) {
                     return res.status(500).end();
                 }
                 else if (!vehicle) {
-                    return res.status(404).json({message: "vehicle not found"});
-                } 
-                else if (vehicle.drivers.length > 3 ) {
-                    return res.status(403).json({message: "maximum drivers assigned, can't assign new"});
+                    return res.status(404).json({ message: "vehicle not found" });
+                }
+                else if (vehicle.drivers.length === 3) {
+                    return res.status(403).json({ message: "maximum drivers assigned, can't assign new" });
                 }
                 else {
-                    return res.json(vehicle);
+                    return Vehicle.findByIdAndUpdate(req.params.id, { $addToSet: { drivers: req.params.driverId } }, { new: true }, function (err, vehicle) {
+                        if (err) {
+                            return res.status(500).end();
+                        }
+                        else {
+                            return res.json(vehicle);
+                        }
+                    })
                 }
             })
         }
