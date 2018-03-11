@@ -16,6 +16,6 @@
 
 The code is described at length in two posts of my blog:
 
-- [Unit Testing Expressjs Controller (Part 1)](https://techighness.com/unit-testing-expressjs-controller-part-1/)
+- [Unit Testing Expressjs Controller (Part 1)](https://techighness.com/post/unit-testing-expressjs-controller-part-1/)
 
-- [Unit Testing Expressjs Controller (Part 2)](https://techighness.com/unit-testing-expressjs-controller-part-2/)
+- [Unit Testing Expressjs Controller (Part 2)](https://techighness.com/post/unit-testing-expressjs-controller-part-2/)
